@@ -1,71 +1,59 @@
 #!/bin/python3
 
 import os
-import hashlib
-import sys
 import shutil
+import sys
 
-#change of plans, you are currently unassigned
-def sha1sum(path):
-    hash = hashlib.sha1()
-    file = open(path, "rb")
-    bytes = file.read()
-    hash.update(bytes)
-    return hash.hexdigest()
-
- 
-def lsrec(dir_path): 
-    result = []
+def ls(dir_path, files = [], dirs = []): 
     elements = os.listdir(dir_path)
     for elem in elements:
         path = os.path.join(dir_path, elem)
         if (os.path.isdir(path)):
-            result.extend(lsrec(path))
+            dirs.append(path)
+            files, dirs = ls(path, files, dirs)
         else:
-            result.append(path)
-    return result
+            files.append(path)
+    return files, dirs
 
-parent = lambda x: os.path.dirname(x)
-base = lambda x: os.path.basename(x)
+def snip_path(dir_path, paths):
+    length = len(dir_path)
+    return [path[length+1:] for path in paths]
 
-def recmkdir(path, left = []):
-    if (os.path.exists(path)):
-        if (len(left) == 0):
-            return
+def dirs_sync(parent, dirs):
+    for dir_path in dirs:
+        path = os.path.join(parent, dir_path)
+        if not (os.path.exists(path)):
+            os.makedirs(path)
+
+def files_sync(dir1_path, dir2_path, files):
+    for file_path in files:
+        source = os.path.join(dir1_path, file_path)
+        destination = os.path.join(dir2_path, file_path)
+        if not (os.path.exists(destination)):
+            shutil.copy2(source, destination)
         else:
-            os.makedirs(os.path.join(path, left[0]))
-            recmkdir(os.path.join(path, left[0]), left[1:])
-    else:
-        left.insert(0, base(path))
-        recmkdir(parent(path), left)
+            stime = os.path.getmtime(source)
+            dtime = os.path.getmtime(destination)
+            if (stime > dtime):
+                shutil.copy2(source, destination)
 
-def handlecopy(apath, bpath):
-    atime = os.path.getmtime(apath)
-    btime = os.path.getmtime(bpath)
-    if (atime > btime):
-        shutil.copy2(apath, bpath)
-    else:
-        shutil.copy2(bpath, apath)
-        
-def sync(dir1, dir2, dir_elems):
-    for elem in dir_elems:
-        dir1_eq = os.path.join(dir1, elem)
-        dir2_eq = os.path.join(dir2, elem)
-        if (os.path.exists(dir2_eq)):
-            handlecopy(dir1_eq, dir2_eq)
-            continue
-        else:
-            recmkdir(parent(dir2_eq))
-            shutil.copy2(dir1_eq, dir2_eq)
-        
-def dirextract(dir, elems):
-    dirlen = len(dir)
-    return [elem[dirlen + 1:] for elem in elems]
+def sync(dir1_path, dir2_path):
+    dir1_files, dir1_dirs = ls(dir1_path, [], [])
+    dir2_files, dir2_dirs = ls(dir2_path, [], [])
+    dir1_files = snip_path(dir1_path, dir1_files)
+    dir1_dirs = snip_path(dir1_path, dir1_dirs)
+    dir2_files = snip_path(dir2_path, dir2_files)
+    dir2_dirs = snip_path(dir2_path, dir2_dirs)
+    dirs_sync(dir2_path, dir1_dirs)
+    files_sync(dir1_path, dir2_path, dir1_files)
+    dirs_sync(dir1_path, dir2_dirs)
+    files_sync(dir2_path, dir1_path, dir2_files)
+    
+if (len(sys.argv) != 3):
+    dir1_path = str(input("Directory 1: "))
+    dir2_path = str(input("Directory 2: "))
+else:
+    dir1_path = sys.argv[1]
+    dir2_path = sys.argv[2]
 
-def supersync(dir1, dir2):
-    dir1_elems = lsrec(dir1)
-    dir2_elems = lsrec(dir2)
-    sync(dir1, dir2, dirextract(dir1, dir1_elems))
-    sync(dir2, dir1, dirextract(dir2, dir2_elems))
-
-supersync(sys.argv[1], sys.argv[2])
+sync(dir1_path, dir2_path)
