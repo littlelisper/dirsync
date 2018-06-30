@@ -40,12 +40,16 @@ def files_sync(dir1_path, dir2_path, files):
 def sync(dir1_path, dir2_path):
     dir1_files, dir1_dirs = ls(dir1_path, [], [])
     dir2_files, dir2_dirs = ls(dir2_path, [], [])
+    
     dir1_files = snip_path(dir1_path, dir1_files)
     dir1_dirs = snip_path(dir1_path, dir1_dirs)
+    
     dir2_files = snip_path(dir2_path, dir2_files)
     dir2_dirs = snip_path(dir2_path, dir2_dirs)
+    
     dirs_sync(dir2_path, dir1_dirs)
     files_sync(dir1_path, dir2_path, dir1_files)
+    
     dirs_sync(dir1_path, dir2_dirs)
     files_sync(dir2_path, dir1_path, dir2_files)
     
