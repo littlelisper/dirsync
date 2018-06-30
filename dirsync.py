@@ -50,10 +50,10 @@ def sync(dir1_path, dir2_path):
     files_sync(dir2_path, dir1_path, dir2_files)
     
 if (len(sys.argv) != 3):
-    dir1_path = str(input("Directory 1: "))
-    dir2_path = str(input("Directory 2: "))
+    dir1_path = os.path.dirname(str(input("Directory 1: ")))
+    dir2_path = os.path.dirname(str(input("Directory 2: ")))
 else:
-    dir1_path = sys.argv[1]
-    dir2_path = sys.argv[2]
+    dir1_path = os.path.dirname(sys.argv[1])
+    dir2_path = os.path.dirname(sys.argv[2])
 
 sync(dir1_path, dir2_path)
