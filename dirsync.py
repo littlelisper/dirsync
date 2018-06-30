@@ -53,11 +53,13 @@ def sync(dir1_path, dir2_path):
     dirs_sync(dir1_path, dir2_dirs)
     files_sync(dir2_path, dir1_path, dir2_files)
 
+proper_path = lambda path: os.path.dirname(path)
+
 def extract_paths():
     paths_file = open('paths.txt', 'r')
     paths = paths_file.read().splitlines()
     for i in range(0, len(paths), 2):
-        sync(paths[i], paths[i+1])
+        sync(proper_path(paths[i]), proper_path(paths[i+1]))
 
 if (len(sys.argv) == 2):
     if (sys.argv[1] == '-l'):
@@ -67,10 +69,10 @@ else:
         if (input("Do you want to use paths file? y/n: ") == 'y'):
             extract_paths()
         else:
-            dir1_path = str(input("Directory 1: "))
-            dir2_path = str(input("Directory 2: "))
+            dir1_path = proper_path(str(input("Directory 1: ")))
+            dir2_path = proper_path(str(input("Directory 2: ")))
             sync(dir1_path, dir2_path)
     else:
-        dir1_path = sys.argv[1]
-        dir2_path = sys.argv[2]
+        dir1_path = proper_path(sys.argv[1])
+        dir2_path = proper_path(sys.argv[2])
         sync(dir1_path, dir2_path)
