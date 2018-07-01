@@ -3,6 +3,7 @@
 import os
 import shutil
 import sys
+import argparse
 
 def ls(dir_path, files = [], dirs = []): 
     elements = os.listdir(dir_path)
@@ -55,24 +56,22 @@ def sync(dir1_path, dir2_path):
 
 proper_path = lambda path: os.path.dirname(path)
 
-def extract_paths():
-    paths_file = open('paths.txt', 'r')
-    paths = paths_file.read().splitlines()
+def extract_paths(paths_file_stream):
+    paths = paths_file_stream.read().splitlines()
     for i in range(0, len(paths), 2):
         sync(proper_path(paths[i]), proper_path(paths[i+1]))
 
-if (len(sys.argv) == 2):
-    if (sys.argv[1] == '-l'):
-        extract_paths()
+parser = argparse.ArgumentParser(description='Asynchronous files sync among between directories')
+parser.add_argument('-f', '--filename', type = argparse.FileType('r'),
+                    help='Read paths from a file')
+parser.add_argument('-p', '--paths', help='Paths to sync', nargs=2)
+args = parser.parse_args()
+
+if (args.filename):
+    extract_paths(args.filename)
+if (args.paths):
+    sync(proper_path(args.paths[0]), proper_path(args.paths[1]))
 else:
-    if (len(sys.argv) != 3):
-        if (input("Do you want to use paths file? y/n: ") == 'y'):
-            extract_paths()
-        else:
-            dir1_path = proper_path(str(input("Directory 1: ")))
-            dir2_path = proper_path(str(input("Directory 2: ")))
-            sync(dir1_path, dir2_path)
-    else:
-        dir1_path = proper_path(sys.argv[1])
-        dir2_path = proper_path(sys.argv[2])
-        sync(dir1_path, dir2_path)
+    dir1_path = proper_path(input("Input dir1 path : "))
+    dir2_path = proper_path(input("Input dir2 path : "))
+    sync(dir1_path, dir2_path)
