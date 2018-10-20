@@ -12,7 +12,7 @@ Additional Arguments
 -f [filename]
 or
 --filename [filename]
-Used read multiple directory paths from a file. The directory paths int the file should be one after the other and the script will sync directories in sets of 2 paths at a time.
+Used to read multiple directory paths from a file. The directory paths int the file should be one after the other and the script will sync directories in sets of 2 paths at a time.
 Example,
 /Directory1
 /Directory2
