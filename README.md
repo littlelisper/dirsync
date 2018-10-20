@@ -1,16 +1,31 @@
 Dirsync
-It syncs contents of two directories both ways, older files are replaced with the latest modified ones.
+It syncs contents of two directories, replacing older files with their latest modified copies from other folder.
 
 How to use:
-It can be run from the terminal as well as a normnal python script.
+It can be executed from a terminal and as an executable.
 To run from the terminal,
     
-python dirsync.py additional_arguments
+python dirsync.py [additional_arguments]
 
-You can pass two directories as arguments or use -f as an argument if you want it to read directory paths from a file.
-It reads paths from path.txt file present in the same folder as the script.
+Additional Arguments
 
-If not given any arguments while being called it will prompt you whether you want to read the directory paths from the paths.txt file or enter the directory paths yourself.
+-f [filename]
+or
+--filename [filename]
+Used read multiple directory paths from a file. The directory paths int the file should be one after the other and the script will sync directories in sets of 2 paths at a time.
+Example,
+/Directory1
+/Directory2
+/Directory3
+/Directory4
+1 and 2 shall be synced first followed by 3 and 4.
+
+-p [path1] [path2]
+or
+--paths [path1] [path2]
+Sync directories of path1 and path2
+
+If not given any arguments when executed it will prompt you whether you want to read the directory paths a file or enter the directory paths yourself. This is the default behaviour when run as an executable.
 
 Development status:
-Still in development.
+Fully usable
